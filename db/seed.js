@@ -2,7 +2,7 @@ const {
   client,
   getAllUsers,
   createUser,
-} = require('./index');
+} = require('./index'); { updateUser };
 
 async function dropTables() {
   try {
@@ -93,26 +93,27 @@ async function createInitialUsers() {
   }
 }
 
-async function updateUser(id, fields ={}){
+async function updateUser(id, fields = {}) {
   // build the set string
   const setString = Object.keys(fields).map(
     (key, index) => `"${ key }"=$${ index + 1 }`
   ).join(', ');
+  console.log(setString, "hello")
 
   // return early if this is called without fields
   if (setString.length === 0) {
     return;
   }
-/// we changed this vvvvv from having keys ////////
+
   try {
-    const result = await client.query(`
+    const {rows: [ user ]} = await client.query(`
       UPDATE users
-      SET "name"='new name', "location"='new location  
-      WHERE id=2;
+      SET ${ setString }
+      WHERE id=${ id }
       RETURNING *;
     `, Object.values(fields));
 
-    return result;
+    return user;
   } catch (error) {
     throw error;
   }
