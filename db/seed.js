@@ -34,12 +34,24 @@ async function createTables() {
       );
     `);
 
+    await client.query(`
+    CREATE TABLE posts(
+      id SERIAL PRIMARY KEY,
+      "authorId" INTEGER REFERENCES users(id) NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      content TEXT NOT NULL,
+      active BOOLEAN DEFAULT true
+    );
+    `);
+
     console.log("Finished building tables!");
   } catch (error) {
     console.error("Error building tables!");
     throw error;
   }
 }
+
+
 
 async function rebuildDB() {
   try {
@@ -118,6 +130,7 @@ async function updateUser(id, fields = {}) {
     throw error;
   }
 }
+
 
 rebuildDB()
   .then(testDB)
