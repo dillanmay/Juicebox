@@ -32,11 +32,12 @@ async function createTables() {
       );
       CREATE TABLE tags (
         id SERIAL PRIMARY KEY,
-        name VARCHAR(255) UNIQUE NOT NULL,
+        name VARCHAR(255) UNIQUE NOT NULL
       );
       CREATE TABLE post_tags (
-        "postId" INTEGER REFERENCES posts(id) UNIQUE,
-        "tagId" INTEGER REFERENCES tags(id) UNIQUE,
+        "postId" INTEGER REFERENCES posts(id) NOT NULL,
+        "tagId" INTEGER REFERENCES tags(id) NOT NULL,
+        UNIQUE ("postId", "tagId")
       );
     `);
 
@@ -53,10 +54,10 @@ async function dropTables() {
 
     // have to make sure to drop in correct order
     await client.query(`
-     DROP TABLE IF EXISTS users;
-     DROP TABLE IF EXISTS posts;
-     DROP TABLE IF EXISTS tags;
-     DROP TABLE IF EXISTS post_tags;
+      DROP TABLE IF EXISTS post_tags;
+      DROP TABLE IF EXISTS tags;
+      DROP TABLE IF EXISTS posts;
+      DROP TABLE IF EXISTS users;
     `);
 
     console.log("Finished dropping tables!");
