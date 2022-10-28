@@ -38,7 +38,7 @@ async function createTags(tagList) {
       VALUES (${insertValues})
       ON CONFLICT(name) DO NOTHING;`, tagList
     )
-    const { rows } = client.query(  `
+    const { rows } = await client.query(`
     SELECT * FROM tags
     WHERE name
     IN (${selectValues});`, tagList
@@ -98,7 +98,7 @@ async function getPostById(postId) {
     post.author = author;
 
     delete post.authorId;
-
+console.log(post, "GOT POST BY ID!")
     return post;
   } catch (error) {
     throw error;
@@ -239,5 +239,9 @@ module.exports = {
   createPost,
   updatePost,
   getAllPosts,
-  getPostsByUser
+  getPostsByUser,
+  createTags,
+  createPostTag,
+  getPostById,
+  addTagsToPost
 }
