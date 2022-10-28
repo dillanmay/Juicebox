@@ -126,6 +126,25 @@ async function createInitialTags() {
   }
 }
 
+async function getPostsByTagName(tagName) {
+  try {
+    const { rows: postIds } = await client.query(`
+      SELECT posts.id
+      FROM posts
+      JOIN post_tags ON posts.id=post_tags."postId"
+      JOIN tags ON tags.id=post_tags."tagId"
+      WHERE tags.name=$1;
+    `, [tagName]);
+
+    return await Promise.all(postIds.map(
+      post => getPostById(post.id)
+    ));
+  } catch (error) {
+    throw error;
+  }
+}
+
+
 async function createInitialPosts() {
   try {
     const [albert, sandra, glamgal] = await getAllUsers();
@@ -203,10 +222,20 @@ async function testDB() {
     console.log("Result:", albert);
 
     console.log("Finished database tests!");
+    console.log("Calling updatePost on posts[1], only updating tags");
+      const updatePostTagsResult = await updatePost(posts[1].id, {
+        tags: ["#youcandoanything", "#redfish", "#bluefish"]
+      });
+      console.log("Result:", updatePostTagsResult);
+
+      console.log("Calling getPostsByTagName with #happy");
+      const postsWithHappy = await getPostsByTagName("#happy");
+      console.log("Result:", postsWithHappy); 
   } catch (error) {
     console.log("Error during testDB");
     throw error;
   }
+    
 }
 
 rebuildDB()
