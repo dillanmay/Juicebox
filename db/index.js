@@ -165,16 +165,19 @@ async function getUserById(userId) {
 async function createPost({
   authorId,
   title,
-  content
+  content,
+  tags = []
 }) {
   try {
-    const { rows: [post] } = await client.query(`
+    const { rows: [ post ] } = await client.query(`
       INSERT INTO posts("authorId", title, content) 
       VALUES($1, $2, $3)
       RETURNING *;
     `, [authorId, title, content]);
 
-    return post;
+    const tagList = await createTags(tags);
+
+    return await addTagsToPost(post.id, tagList);
   } catch (error) {
     throw error;
   }
@@ -205,12 +208,16 @@ async function updatePost(id, fields = {}) {
 
 async function getAllPosts() {
   try {
-    const { rows } = await client.query(`
-      SELECT *
+    const { rows: postIds } = await client.query(`
+      SELECT id
       FROM posts;
     `);
 
-    return rows;
+    const posts = await Promise.all(postIds.map(
+      post => getPostById( post.id )
+    ));
+console.log(posts, "get all posts boiz")
+    return posts;
   } catch (error) {
     throw error;
   }
@@ -218,13 +225,17 @@ async function getAllPosts() {
 
 async function getPostsByUser(userId) {
   try {
-    const { rows } = await client.query(`
-      SELECT * 
-      FROM posts
-      WHERE "authorId"=${userId};
+    const { rows: postIds } = await client.query(`
+      SELECT id 
+      FROM posts 
+      WHERE "authorId"=${ userId };
     `);
 
-    return rows;
+    const posts = await Promise.all(postIds.map(
+      post => getPostById( post.id )
+    ));
+    console.log(posts, "cowboys are better than jags")
+    return posts;
   } catch (error) {
     throw error;
   }
