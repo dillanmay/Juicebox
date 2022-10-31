@@ -1,7 +1,9 @@
 const express = require('express');
 const usersRouter = express.Router();
 
-const { getAllUsers } = require('../db');
+const { getAllUsers, getUserByUsername } = require('../db');
+const { JWT_SECRET } = process.env;
+const jwt = require('jsonwebtoken');
 
 usersRouter.post('/login', async (req, res, next) => {
   const { username, password } = req.body;
@@ -12,14 +14,15 @@ usersRouter.post('/login', async (req, res, next) => {
       name: "MissingCredentialsError",
       message: "Please supply both a username and password"
     });
-  }
+}
 
   try {
     const user = await getUserByUsername(username);
 
     if (user && user.password == password) {
       // create token & return to user
-      res.send({ message: "you're logged in!" });
+      const token = jwt.sign({username, id:user.id}, JWT_SECRET)
+      res.send({ message:"you're logged in!", token });
     } else {
       next({ 
         name: 'IncorrectCredentialsError', 
