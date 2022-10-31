@@ -267,6 +267,24 @@ async function getPostsByUser(userId) {
   }
 }
 
+async function getAllTags() {
+  try {
+    const { rows } = await client.query(`
+      SELECT *
+      FROM tags;
+    `);
+
+//     const tags = await Promise.all(tagsIds.map(
+//       tag => getTagsById( tag.id )
+//     ));
+// console.log(tags, "get all tag boiz")
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
 module.exports = {
   client,
   createUser,
@@ -280,5 +298,6 @@ module.exports = {
   createTags,
   createPostTag,
   getPostById,
-  addTagsToPost
+  addTagsToPost,
+  getAllTags
 }
