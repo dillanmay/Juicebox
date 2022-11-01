@@ -9,6 +9,11 @@ function requireUser(req, res, next) {
     next();
   }
   
+  someRouter.post('/some/route', requireUser, async (req, res, next) => {
+
+});
+
+
   module.exports = {
     requireUser
   }
