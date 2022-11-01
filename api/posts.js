@@ -5,7 +5,7 @@ const { requireUser } = require('./utils');
 
 
 postsRouter.post('/', requireUser, async (req, res, next) => {
-  const { title, content, tags = "" } = req.body;
+  res.send({ message:'under construction'});
 
   const tagArr = tags.trim().split(/\s+/)
   const postData = {};
